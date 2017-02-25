@@ -45,28 +45,29 @@ public class SignUp extends AppCompatActivity implements LoaderCallbacks<Cursor>
     private static final int REQUEST_READ_CONTACTS = 0;
 
     /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
-    /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
     private UserLoginTask mAuthTask = null;
 
+    // DB Handler
+    databaseHelper mydb;
+
     // UI references.
+    private AutoCompleteTextView mNameView;
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
+    private EditText mConfirmPasswordView;
     private View mProgressView;
-    private View mLoginFormView;
+    private View mSignUpFormView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-        // Set up the login form.
+        // Set up the DB handler
+        mydb = new databaseHelper(this);
+        // Set up the Sign Up form.
+        mNameView = (AutoCompleteTextView) findViewById(R.id.name);
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
 
@@ -74,15 +75,25 @@ public class SignUp extends AppCompatActivity implements LoaderCallbacks<Cursor>
         mPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
-                if (id == R.id.login || id == EditorInfo.IME_NULL) {
+                if (id == R.id.signUp || id == EditorInfo.IME_NULL) {
                     attemptLogin();
                     return true;
                 }
                 return false;
             }
         });
-
-        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        mConfirmPasswordView = (EditText) findViewById(R.id.confirm_password);
+        mConfirmPasswordView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int id, KeyEvent keyEvent) {
+                if (id == R.id.signUp || id == EditorInfo.IME_NULL) {
+                    attemptLogin();
+                    return true;
+                }
+                return false;
+            }
+        });
+        Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_up_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -90,8 +101,8 @@ public class SignUp extends AppCompatActivity implements LoaderCallbacks<Cursor>
             }
         });
 
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
+        mSignUpFormView = findViewById(R.id.signUp_form);
+        mProgressView = findViewById(R.id.signUp_progress);
     }
 
     private void populateAutoComplete() {
@@ -151,10 +162,13 @@ public class SignUp extends AppCompatActivity implements LoaderCallbacks<Cursor>
         // Reset errors.
         mEmailView.setError(null);
         mPasswordView.setError(null);
+        mNameView.setError(null);
 
         // Store values at the time of the login attempt.
+        String name = mNameView.getText().toString();
         String email = mEmailView.getText().toString();
         String password = mPasswordView.getText().toString();
+        String confirm_password = mConfirmPasswordView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -163,6 +177,20 @@ public class SignUp extends AppCompatActivity implements LoaderCallbacks<Cursor>
         if (!TextUtils.isEmpty(password) && !isPasswordValid(password)) {
             mPasswordView.setError(getString(R.string.error_invalid_password));
             focusView = mPasswordView;
+            cancel = true;
+        }
+
+        // Check for a valid confirm password, if the user entered one.
+        if (!TextUtils.isEmpty(confirm_password) && !isPasswordValid(confirm_password) || !password.equals(confirm_password)) {
+            mConfirmPasswordView.setError(getString(R.string.error_invalid_password));
+            focusView = mConfirmPasswordView;
+            cancel = true;
+        }
+
+        // Check for a valid name.
+        if (TextUtils.isEmpty(name)) {
+            mNameView.setError(getString(R.string.error_field_required));
+            focusView = mNameView;
             cancel = true;
         }
 
@@ -185,7 +213,7 @@ public class SignUp extends AppCompatActivity implements LoaderCallbacks<Cursor>
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mAuthTask = new UserLoginTask(email, password);
+            mAuthTask = new UserLoginTask(email, password, name);
             mAuthTask.execute((Void) null);
         }
     }
@@ -211,12 +239,12 @@ public class SignUp extends AppCompatActivity implements LoaderCallbacks<Cursor>
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
-            mLoginFormView.animate().setDuration(shortAnimTime).alpha(
+            mSignUpFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mSignUpFormView.animate().setDuration(shortAnimTime).alpha(
                     show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
                 @Override
                 public void onAnimationEnd(Animator animation) {
-                    mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+                    mSignUpFormView.setVisibility(show ? View.GONE : View.VISIBLE);
                 }
             });
 
@@ -232,7 +260,7 @@ public class SignUp extends AppCompatActivity implements LoaderCallbacks<Cursor>
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
             mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
-            mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+            mSignUpFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         }
     }
 
@@ -295,35 +323,21 @@ public class SignUp extends AppCompatActivity implements LoaderCallbacks<Cursor>
      * the user.
      */
     public class UserLoginTask extends AsyncTask<Void, Void, Boolean> {
-
         private final String mEmail;
         private final String mPassword;
+        private final String mName;
 
-        UserLoginTask(String email, String password) {
+        UserLoginTask(String email, String password, String name) {
             mEmail = email;
             mPassword = password;
+            mName = name;
+
         }
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-
-            try {
-                // Simulate network access.
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                return false;
-            }
-
-            for (String credential : DUMMY_CREDENTIALS) {
-                String[] pieces = credential.split(":");
-                if (pieces[0].equals(mEmail)) {
-                    // Account exists, return true if the password matches.
-                    return pieces[1].equals(mPassword);
-                }
-            }
-
-            // TODO: register the new account here.
+            // Insert New User Data into the DB
+            mydb.insertUserData(mName, mPassword, mEmail);
             return true;
         }
 
