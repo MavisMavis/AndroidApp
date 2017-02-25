@@ -60,7 +60,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
     // DB Handler
     databaseHelper mydb;
-    int attempts = 3;
+
     // UI references.
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
@@ -305,7 +305,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
 
         private final String mEmail;
         private final String mPassword;
-
+        private boolean login_state = false;
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
@@ -321,24 +321,7 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                 String databasePass = res.getString(2);
                 if (mEmail.equals(res.getString(3)) && mPassword.equals(databasePass))
                 {
-                    //Intent intent = new Intent(this, MainActivity.class);
-                    //intent.putExtra(MainActivity.EXTRA_MESSAGE, inputName.getText().toString());
-                    Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_LONG).show();Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_LONG).show();
-                    //startActivity(intent);
-                }
-                else
-                {
-                    Toast.makeText(LoginActivity.this, "Invalid Username and Password" + "\n Attempt Left : " + attempts, Toast.LENGTH_SHORT).show();
-                    attempts--;
-
-
-
-                    if (attempts == 0)
-                    {
-                        Toast.makeText(LoginActivity.this, "Invalid Username and Password" + "\n Attempt Left : " + attempts, Toast.LENGTH_SHORT).show();
-                        Toast.makeText(LoginActivity.this, "You had use up all your attempts. Button will be disable" + attempts, Toast.LENGTH_SHORT).show();
-                        //btnSignUp.setEnabled(false);
-                    }
+                    login_state = true; // set to true when login authentication is successful
                 }
             }
             return true;
@@ -349,9 +332,15 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             mAuthTask = null;
             showProgress(false);
 
-            if (success) {
+            if (success && login_state) {
+                Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_LONG).show();
+                Intent intent = new Intent(LoginActivity.this, ContentActivity.class);
+                startActivity(intent);
                 finish();
             } else {
+
+                Toast.makeText(LoginActivity.this, "Invalid Username and Password. Please try again.", Toast.LENGTH_SHORT).show();
+
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
                 mPasswordView.requestFocus();
             }

@@ -33,6 +33,10 @@
             android:name=".SignUp"
             android:label="@string/title_activity_sign_up">
         </activity>
+        <activity
+            android:name=".ContentActivity"
+            android:label="Keep Diary">
+        </activity>
     </application>
 
 </manifest>
