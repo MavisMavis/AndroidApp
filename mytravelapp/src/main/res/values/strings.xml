@@ -9,7 +9,7 @@
 
     <string name="action_settings">Settings</string>
     <string name="title_activity_login">Sign in</string>
-
+    <string name="pick_date">Pick A Date</string>
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
     <string name="name">Full Name</string>
@@ -27,4 +27,5 @@
         completions."
     </string>
     <string name="title_activity_sign_up">Sign up</string>
+    <string name="title_activity_new_diary">New Diary</string>
 </resources>

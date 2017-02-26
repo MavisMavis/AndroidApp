@@ -23,9 +23,11 @@ public class databaseHelper extends SQLiteOpenHelper {
 
     //diary table
     public static final String diary_id = "DIARY_ID";
+    public static final String diary_title = "DIARY_TITLE";
+    public static final String diary_location = "DIARY_LOCATION";
     public static final String diary_image = "DIARY_IMG";
     public static final String diary_info ="DIARY_INFO";
-    public static final String created_at = "CREATED_AT";
+    public static final String diary_date = "DIARY_DATE";
 
     public databaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -35,7 +37,7 @@ public class databaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
         sqLiteDatabase.execSQL("CREATE TABLE " + USER_TABLE + "(" + user_id + " INTEGER PRIMARY KEY AUTOINCREMENT, " + user_name + " TEXT, " + user_pass + " TEXT, " + email_add + " TEXT)");
-        sqLiteDatabase.execSQL("CREATE TABLE " + DIARY_TABLE + "(" + diary_id + " INTEGER PRIMARY KEY AUTOINCREMENT, " + diary_image + " TEXT, " + diary_info +" TEXT, " + created_at + " TEXT)");
+        sqLiteDatabase.execSQL("CREATE TABLE " + DIARY_TABLE + "(" + diary_id + " INTEGER PRIMARY KEY AUTOINCREMENT, " + diary_title + " TEXT, " + diary_location + " TEXT, " + diary_image + " TEXT, " + diary_info +" TEXT, " + diary_date + " TEXT)");
 
     }
 
@@ -67,13 +69,15 @@ public class databaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public boolean insertDiaryData(String dairyImg, String dairyInfo, String createAt)
+    public boolean insertDiaryData(String diaryTitle, String diaryLocation, String diaryImg, String diaryInfo, String diaryDate)
     {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
-        contentValues.put(diary_image, dairyImg);
-        contentValues.put(diary_info, dairyInfo);
-        contentValues.put(created_at, createAt);
+        contentValues.put(diary_title, diaryTitle);
+        contentValues.put(diary_location, diaryLocation);
+        contentValues.put(diary_image, diaryImg);
+        contentValues.put(diary_info, diaryInfo);
+        contentValues.put(diary_date, diaryDate);
 
         long result = sqLiteDatabase.insert(DIARY_TABLE, null, contentValues);
 
@@ -95,7 +99,7 @@ public class databaseHelper extends SQLiteOpenHelper {
         return res;
     }
 
-    public Cursor viewAllDairyRecords()
+    public Cursor viewAllDiaryRecords()
     {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         Cursor res = sqLiteDatabase.rawQuery("SELECT * FROM " + DIARY_TABLE, null);
@@ -113,7 +117,7 @@ public class databaseHelper extends SQLiteOpenHelper {
     public Cursor viewSelectedDiaryRecord(String id)
     {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        Cursor res = sqLiteDatabase.rawQuery("SELECT * FROM " + DIARY_TABLE + " WHERE DIARY_ID = " + id, null);
+        Cursor res = sqLiteDatabase.rawQuery("SELECT * FROM " + DIARY_TABLE + " WHERE " + diary_id + " = " + id, null);
 
         return res;
     }
@@ -122,7 +126,7 @@ public class databaseHelper extends SQLiteOpenHelper {
     {
         String args[] = {date};
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        Cursor res = sqLiteDatabase.rawQuery("SELECT * FROM " + DIARY_TABLE + " WHERE CREATED_AT = ?", args);
+        Cursor res = sqLiteDatabase.rawQuery("SELECT * FROM " + DIARY_TABLE + " WHERE " + diary_date + " = ?", args);
 
         return res;
     }
