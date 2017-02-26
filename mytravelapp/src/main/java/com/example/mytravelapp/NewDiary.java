@@ -1,22 +1,30 @@
 package com.example.mytravelapp;
 
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
@@ -24,6 +32,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -41,10 +50,13 @@ public class NewDiary extends AppCompatActivity {
     EditText mLocationView;
     TextView mImageView;
     EditText mDiaryView;
+    String imgDecodableString;
+    public String userChoosenTask;
     Button btnImageUpload;
     Button btnNewDiary;
     DatePickerDialog datePickerDialog;
     databaseHelper mydb;
+    ImageView imgvw;
     private static int RESULT_LOAD_IMG = 2;
     public int REQUEST_CAMERA = 0, SELECT_FILE = 1;
     public static final String MyPREFERENCES = "ProfileImage";
@@ -91,6 +103,7 @@ public class NewDiary extends AppCompatActivity {
         mLocationView = (EditText) findViewById(R.id.diary_location);
         // initiate the diary image
         mImageView = (TextView) findViewById(R.id.imageViewDescription);
+
         // initiate image button
         btnImageUpload = (Button) findViewById(R.id.btnImageUpload);
         btnImageUpload.setOnClickListener(new View.OnClickListener() {
@@ -163,8 +176,12 @@ public class NewDiary extends AppCompatActivity {
                         int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                         imgDecodableString = cursor.getString(columnIndex);
                         cursor.close();
-                        boolean isInserted = mydb.insertDairyData(imgDecodableString, date);
 
+                        Toast.makeText(this, "You have picked an Image" + imgDecodableString,
+                                Toast.LENGTH_LONG).show();
+                        mImageView.setText(imgDecodableString);
+                        //boolean isInserted = mydb.insertDairyData(imgDecodableString, date);
+                        /*
                         if (isInserted == true)
                         {
                             Toast.makeText(this, "Image Input Success", Toast.LENGTH_LONG).show();
@@ -175,7 +192,7 @@ public class NewDiary extends AppCompatActivity {
                         {
                             Toast.makeText(this, "Error. Something Error", Toast.LENGTH_LONG).show();
                         }
-
+                        */
                         //ImageView imgView3 = (ImageView) findViewById(R.id.imageView3);
                         // Set the Image in ImageView after decoding the String
                         //imgView3.setImageBitmap(BitmapFactory
@@ -186,15 +203,91 @@ public class NewDiary extends AppCompatActivity {
                                 Toast.LENGTH_LONG).show();
                     }
                 } catch (Exception e) {
-                    Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG)
-                            .show();
+                    Toast.makeText(this, e.toString(), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, "Something went wrong", Toast.LENGTH_LONG).show();
                 }
             }
             else if (requestCode == REQUEST_CAMERA)
                 onCaptureImageResult(data);
         }
     }
+    private void selectImage() {
+        final CharSequence[] items = { "Take Photo", "Choose from Library",
+                "Cancel" };
+        AlertDialog.Builder builder = new AlertDialog.Builder(NewDiary.this);
+        builder.setTitle("Add Photo!");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                boolean result=Utility.checkPermission(NewDiary.this);
+                if (items[item].equals("Take Photo")) {
+                    userChoosenTask="Take Photo";
+                    if(result)
+                        cameraIntent();
+                } else if (items[item].equals("Choose from Library")) {
+                    userChoosenTask="Choose from Library";
+                    if(result)
+                        galleryIntent();
+                } else if (items[item].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+    }
 
+
+
+/*
+    private void selectImage() {
+        final CharSequence[] items = { "Use Camera", "Choose from Gallery",
+                "Cancel" };
+
+        //Using Alert Dialog
+        AlertDialog.Builder builder = new AlertDialog.Builder(NewDiary.this);
+        builder.setTitle("Capture Image!");
+        builder.setItems(items, new DialogInterface.OnClickListener() {
+
+            //capture click event on the Dialog
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+                boolean result = Utility.checkPermission(NewDiary.this);
+
+                if (items[item].equals("Use Camera")) {
+                    userChoosenTask ="Use Camera";
+                    if(result)
+                        cameraIntent();
+
+                } else if (items[item].equals("Choose from Gallery")) {
+                    userChoosenTask ="Choose from Gallery";
+                    if(result)
+                        galleryIntent();
+
+                } else if (items[item].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+    }
+*/
+
+    //Check user selection, and handle permission request
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case Utility.MY_PERMISSIONS_REQUEST_READ_EXTERNAL_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    if(userChoosenTask.equals("Use Camera"))
+                        cameraIntent();
+                    else if(userChoosenTask.equals("Choose from Gallery"))
+                        galleryIntent();
+                } else {
+                    //code for deny
+                }
+                break;
+        }
+    }
     //Camera Intent and Gallery Intent methods
     private void galleryIntent()
     {

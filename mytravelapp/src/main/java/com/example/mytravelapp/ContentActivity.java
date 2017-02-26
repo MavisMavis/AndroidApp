@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class ContentActivity extends AppCompatActivity {
@@ -19,7 +20,7 @@ public class ContentActivity extends AppCompatActivity {
     public static final String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
     private static int RESULT_LOAD_IMG = 2;
     TextView todayDate;
-
+    private ArrayList<Diary> diaryList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
