@@ -60,7 +60,8 @@
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/imageView"
         android:layout_alignEnd="@+id/diary_title"
-        android:id="@+id/imageViewDescription"/>
+        android:id="@+id/imageViewDescription"
+        android:visibility="invisible"/>
 
     <TextView
         android:text="Diary Entry : "

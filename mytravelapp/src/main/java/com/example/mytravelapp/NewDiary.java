@@ -153,7 +153,7 @@ public class NewDiary extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        Bitmap bm = null;
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == SELECT_FILE)
                 onSelectFromGalleryResult(data);
@@ -163,7 +163,8 @@ public class NewDiary extends AppCompatActivity {
                     // When an Image is picked
                     if (resultCode == RESULT_OK && null != data) {
                         // Get the Image from data
-
+                        bm = MediaStore.Images.Media.getBitmap(getApplicationContext().getContentResolver(), data.getData());
+                        String encodeImage = getStringImage(bm);
                         Uri selectedImage = data.getData();
                         String[] filePathColumn = { MediaStore.Images.Media.DATA };
 
@@ -176,10 +177,8 @@ public class NewDiary extends AppCompatActivity {
                         int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                         imgDecodableString = cursor.getString(columnIndex);
                         cursor.close();
-
-                        Toast.makeText(this, "You have picked an Image" + imgDecodableString,
-                                Toast.LENGTH_LONG).show();
-                        mImageView.setText(imgDecodableString);
+                        Toast.makeText(this, "Image : "+ encodeImage, Toast.LENGTH_LONG).show();
+                        mImageView.setText(encodeImage);
                         //boolean isInserted = mydb.insertDairyData(imgDecodableString, date);
                         /*
                         if (isInserted == true)
