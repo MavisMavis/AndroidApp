@@ -2,12 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:weightSum="1">
 
     <ScrollView
         android:id="@+id/scrollView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="380dp"
+        android:layout_height="317dp"
+        android:layout_weight="0.96">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -56,5 +58,24 @@
         </LinearLayout>
 
     </ScrollView>
+
+    <Button
+        android:text="Edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnEdit"
+        android:fontFamily="sans-serif"
+        android:textStyle="normal|bold"
+        android:textSize="14sp"
+        />
+
+    <Button
+        android:text="Delete"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnDelete"
+        android:textStyle="normal|bold"
+        android:textAlignment="center"
+        android:fontFamily="sans-serif"/>
 
 </LinearLayout>

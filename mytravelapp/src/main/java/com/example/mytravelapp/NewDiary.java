@@ -139,8 +139,9 @@ public class NewDiary extends AppCompatActivity {
         String location = mLocationView.getText().toString();
         String image = mImageView.getText().toString();
         String diary = mDiaryView.getText().toString();
-
-        boolean success = mydb.insertDiaryData(title, location, image, diary, date);
+        SharedPreferences setting = getSharedPreferences("usersettings", Context.MODE_PRIVATE);
+        String userID = setting.getString("ID", "");
+        boolean success = mydb.insertDiaryData(title, location, image, diary, date, userID);
 
        if(success){
            Toast.makeText(NewDiary.this, "New Diary Entry Successful", Toast.LENGTH_SHORT).show();
@@ -177,25 +178,9 @@ public class NewDiary extends AppCompatActivity {
                         int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
                         imgDecodableString = cursor.getString(columnIndex);
                         cursor.close();
-                        Toast.makeText(this, "Image : "+ encodeImage, Toast.LENGTH_LONG).show();
+                        //Toast.makeText(this, "Image : "+ encodeImage, Toast.LENGTH_LONG).show();
                         mImageView.setText(encodeImage);
-                        //boolean isInserted = mydb.insertDairyData(imgDecodableString, date);
-                        /*
-                        if (isInserted == true)
-                        {
-                            Toast.makeText(this, "Image Input Success", Toast.LENGTH_LONG).show();
-                            finish();
-                            startActivity(getIntent());
-                        }
-                        else
-                        {
-                            Toast.makeText(this, "Error. Something Error", Toast.LENGTH_LONG).show();
-                        }
-                        */
-                        //ImageView imgView3 = (ImageView) findViewById(R.id.imageView3);
-                        // Set the Image in ImageView after decoding the String
-                        //imgView3.setImageBitmap(BitmapFactory
-                        //  .decodeFile(imgDecodableString));
+
 
                     } else {
                         Toast.makeText(this, "You haven't picked Image",

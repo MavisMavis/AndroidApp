@@ -28,6 +28,7 @@ public class databaseHelper extends SQLiteOpenHelper {
     public static final String diary_image = "DIARY_IMG";
     public static final String diary_info ="DIARY_INFO";
     public static final String diary_date = "DIARY_DATE";
+    public static final String diary_user_id = "USER_ID";
 
     public databaseHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -37,7 +38,7 @@ public class databaseHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
 
         sqLiteDatabase.execSQL("CREATE TABLE " + USER_TABLE + "(" + user_id + " INTEGER PRIMARY KEY AUTOINCREMENT, " + user_name + " TEXT, " + user_pass + " TEXT, " + email_add + " TEXT)");
-        sqLiteDatabase.execSQL("CREATE TABLE " + DIARY_TABLE + "(" + diary_id + " INTEGER PRIMARY KEY AUTOINCREMENT, " + diary_title + " TEXT, " + diary_location + " TEXT, " + diary_image + " TEXT, " + diary_info +" TEXT, " + diary_date + " TEXT)");
+        sqLiteDatabase.execSQL("CREATE TABLE " + DIARY_TABLE + "(" + diary_id + " INTEGER PRIMARY KEY AUTOINCREMENT, " + diary_title + " TEXT, " + diary_location + " TEXT, " + diary_image + " TEXT, " + diary_info +" TEXT, " + diary_date + " TEXT, " + diary_user_id + " TEXT)");
 
     }
 
@@ -69,7 +70,7 @@ public class databaseHelper extends SQLiteOpenHelper {
         }
     }
 
-    public boolean insertDiaryData(String diaryTitle, String diaryLocation, String diaryImg, String diaryInfo, String diaryDate)
+    public boolean insertDiaryData(String diaryTitle, String diaryLocation, String diaryImg, String diaryInfo, String diaryDate, String diaryUserID)
     {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
@@ -78,6 +79,7 @@ public class databaseHelper extends SQLiteOpenHelper {
         contentValues.put(diary_image, diaryImg);
         contentValues.put(diary_info, diaryInfo);
         contentValues.put(diary_date, diaryDate);
+        contentValues.put(diary_user_id, diaryUserID);
 
         long result = sqLiteDatabase.insert(DIARY_TABLE, null, contentValues);
 
@@ -99,10 +101,10 @@ public class databaseHelper extends SQLiteOpenHelper {
         return res;
     }
 
-    public Cursor viewAllDiaryRecords()
+    public Cursor viewAllDiaryRecords(String id)
     {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        Cursor res = sqLiteDatabase.rawQuery("SELECT * FROM " + DIARY_TABLE, null);
+        Cursor res = sqLiteDatabase.rawQuery("SELECT * FROM " + DIARY_TABLE + " WHERE USER_ID = " + id, null);
 
         return res;
     }
@@ -112,6 +114,17 @@ public class databaseHelper extends SQLiteOpenHelper {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
 
         return sqLiteDatabase.delete(DIARY_TABLE, "DIARY_ID = ?", new String[] {id});
+    }
+
+    public Integer editDiaryRecord(String diaryID, String diaryTitle, String diaryLocation, String diaryImg, String diaryInfo)
+    {
+        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(diary_title,diaryTitle);
+        cv.put(diary_location,diaryLocation);
+        cv.put(diary_image,diaryImg);
+        cv.put(diary_info,diaryInfo);
+        return sqLiteDatabase.update(DIARY_TABLE, cv, "DIARY_ID = ?", new String[] {diaryID});
     }
 
     public Cursor viewSelectedDiaryRecord(String id)

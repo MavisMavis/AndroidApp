@@ -6,6 +6,8 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -30,6 +32,12 @@ public class DetailsActivity extends AppCompatActivity {
         TextView titleDetails = (TextView) findViewById(R.id.details_title);
         TextView locationDetails = (TextView) findViewById(R.id.details_location);
         TextView infoDetails = (TextView) findViewById(R.id.details_info);
+        Button editDiary = (Button) findViewById(R.id.btnEdit);
+        Button deleteDiary = (Button) findViewById(R.id.btnDelete);
+
+        // DB handler
+        databaseHelper mydb;
+        mydb = new databaseHelper(this);
 
 
 
@@ -55,8 +63,21 @@ public class DetailsActivity extends AppCompatActivity {
         locationDetails.setText(location);
         infoDetails.setText(info);
 
-        //set the title of this activity to be the street name
-        //getSupportActionBar().setTitle(title);
+
+        // Set On Click Listener for buttons
+        editDiary.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
+        deleteDiary.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mydb.deleteDiaryRecord(id);
+            }
+        });
     }
 
     //convert image bitmap to String (using Base 64)

@@ -3,6 +3,7 @@ package com.example.mytravelapp;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -41,14 +42,14 @@ public class ContentActivity extends AppCompatActivity {
         setContentView(R.layout.activity_content);
         //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         //setSupportActionBar(toolbar);
+        SharedPreferences setting = getSharedPreferences("usersettings", Context.MODE_PRIVATE);
+        String userID = setting.getString("ID", "");
         mydb = new databaseHelper(this);
-        // Display the today's date at the content page
-        todayDate = (TextView) findViewById(R.id.today_date);
-        String today = todayDate.getText().toString() + date.toString();
-        todayDate.setText(today);
-        Cursor res = mydb.viewAllDiaryRecords();
+
+        Cursor res = mydb.viewAllDiaryRecords(userID);
         while (res.moveToNext())
         {
+            // Add All Diary Records into the array list
             diaryList.add(new DiaryDetails(res.getInt(0), res.getString(1), res.getString(2), res.getString(3), res.getString(4), res.getString(5)));
 
         }
@@ -145,15 +146,15 @@ public class ContentActivity extends AppCompatActivity {
             ImageView image = (ImageView) view.findViewById(R.id.dImage);
 
             //set address and description
-            String dTitle = diary.getDiary_title();
-            title.setText(dTitle);
+            String dTitle = diary.getDiary_date();
+            title.setText("Date : " + dTitle);
             //display trimmed excerpt for description
-            int descriptionLength = diary.getDiary_info().length();
+            int descriptionLength = diary.getDiary_title().length();
             if(descriptionLength >= 100){
-                String descriptionTrim = diary.getDiary_info().substring(0, 100) + "...";
-                description.setText(descriptionTrim);
+                String descriptionTrim = diary.getDiary_title().substring(0, 100) + "...";
+                description.setText("Title : " + descriptionTrim);
             }else{
-                description.setText(diary.getDiary_info());
+                description.setText("Title : " + diary.getDiary_title());
             }
 
             //get the image associated with this property

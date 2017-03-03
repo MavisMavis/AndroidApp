@@ -61,7 +61,7 @@
         android:layout_alignBottom="@+id/imageView"
         android:layout_alignEnd="@+id/diary_title"
         android:id="@+id/imageViewDescription"
-        android:visibility="invisible"/>
+        android:gravity="right"/>
 
     <TextView
         android:text="Diary Entry : "
@@ -125,7 +125,8 @@
         android:layout_alignParentTop="true"
         android:layout_alignStart="@+id/diary_title"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"/>
+        android:layout_width="wrap_content"
+        android:/>
 
     <TextView
         android:id="@+id/locationView"
