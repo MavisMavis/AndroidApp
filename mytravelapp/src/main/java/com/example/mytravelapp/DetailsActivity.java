@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 
@@ -18,6 +19,11 @@ import java.io.ByteArrayOutputStream;
  */
 
 public class DetailsActivity extends AppCompatActivity {
+
+    // DB handler
+    databaseHelper mydb;
+    String id, title, location, img, info, date;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -35,29 +41,33 @@ public class DetailsActivity extends AppCompatActivity {
         Button editDiary = (Button) findViewById(R.id.btnEdit);
         Button deleteDiary = (Button) findViewById(R.id.btnDelete);
 
-        // DB handler
-        databaseHelper mydb;
-        mydb = new databaseHelper(this);
+
 
 
 
         //collect our intent and populate our layout
         Intent intent = getIntent();
 
-        String id = intent.getStringExtra("diaryID");
-        String title = intent.getStringExtra("diaryTitle");
-        String location = intent.getStringExtra("diaryLocation");
-        String img = intent.getStringExtra("diaryImg");
-        String info = intent.getStringExtra("diaryInfo");
-        String date = intent.getStringExtra("diaryDate");
+        id = intent.getStringExtra("diaryID");
+        title = intent.getStringExtra("diaryTitle");
+        location = intent.getStringExtra("diaryLocation");
+        img = intent.getStringExtra("diaryImg");
+        info = intent.getStringExtra("diaryInfo");
+        date = intent.getStringExtra("diaryDate");
 
 
-        //get the image associated with this property
-        Bitmap decodeImage = decodeToBase64(img);
 
+        // Check if it is a valid image else display default no-image placeholder
+        if(img.contains("Example")){
+            imageView.setImageResource(R.drawable.noimagefound);
+        }
+        else {
+            //get the image associated with this property
+            Bitmap decodeImage = decodeToBase64(img);
+            imageView.setImageBitmap(decodeImage);
+        }
 
         //set elements
-        imageView.setImageBitmap(decodeImage);
         dateDetails.setText(date);
         titleDetails.setText(title);
         locationDetails.setText(location);
@@ -68,14 +78,27 @@ public class DetailsActivity extends AppCompatActivity {
         editDiary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                Intent intent = new Intent(DetailsActivity.this, EditDiaryDetails.class);
+                intent.putExtra("diaryID", id);
+                intent.putExtra("diaryTitle", title);
+                intent.putExtra("diaryLocation", location);
+                intent.putExtra("diaryImg", img);
+                intent.putExtra("diaryInfo", info);
+                intent.putExtra("diaryDate", date);
+                startActivity(intent);
+                finish();
             }
         });
 
         deleteDiary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                mydb = new databaseHelper(DetailsActivity.this);
                 mydb.deleteDiaryRecord(id);
+                Toast.makeText(DetailsActivity.this, "Diary Entry Deleted", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(DetailsActivity.this, ContentActivity.class);
+                startActivity(intent);
+                finish();
             }
         });
     }

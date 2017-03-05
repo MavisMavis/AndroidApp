@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.text.SimpleDateFormat;
@@ -33,15 +35,12 @@ import java.util.List;
 public class ContentActivity extends AppCompatActivity {
     databaseHelper mydb;
     public static final String date = new SimpleDateFormat("dd-MM-yyyy").format(new Date());
-    private static int RESULT_LOAD_IMG = 2;
-    TextView todayDate;
     private ArrayList<DiaryDetails> diaryList = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_content);
-        //Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        //setSupportActionBar(toolbar);
+
         SharedPreferences setting = getSharedPreferences("usersettings", Context.MODE_PRIVATE);
         String userID = setting.getString("ID", "");
         mydb = new databaseHelper(this);
@@ -64,11 +63,6 @@ public class ContentActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Create intent to Open Image applications like Gallery, Google Photos
-                //Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                  //      android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                // Start the Intent
-                //startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
                 Intent intent = new Intent(ContentActivity.this, NewDiary.class);
                 startActivity(intent);
             }
@@ -83,7 +77,7 @@ public class ContentActivity extends AppCompatActivity {
                 DiaryDetails diaries = diaryList.get(position);
 
                 Intent intent = new Intent(ContentActivity.this, DetailsActivity.class);
-                intent.putExtra("diaryID", diaries.getDiary_id());
+                intent.putExtra("diaryID", String.valueOf(diaries.getDiary_id()));
                 intent.putExtra("diaryTitle", diaries.getDiary_title());
                 intent.putExtra("diaryLocation", diaries.getDiary_location());
                 intent.putExtra("diaryImg", diaries.getDiary_image());
@@ -97,25 +91,6 @@ public class ContentActivity extends AppCompatActivity {
         //set the listener to the list view
         listView.setOnItemClickListener(adapterViewListener);
     }
-/*
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.nav__bar, menu);
-        return super.onCreateOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_settings:
-                //Write your code
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }*/
 
     //custom ArrayAdapter
     class diaryArrayAdapter extends ArrayAdapter<DiaryDetails> {
@@ -159,10 +134,15 @@ public class ContentActivity extends AppCompatActivity {
 
             //get the image associated with this property
             String imgstr = diary.getDiary_image().toString();
-            Bitmap decodeImage = decodeToBase64(imgstr);
-            //int imageID = context.getResources().getIdentifier(property.getImage(), "drawable", context.getPackageName());
-            image.setImageBitmap(decodeImage);
 
+            // Check if it is a valid image else display default no-image placeholder
+            if(imgstr.contains("Example")){
+                image.setImageResource(R.drawable.noimagefound);
+            }
+            else {
+                Bitmap decodeImage = decodeToBase64(imgstr);
+                image.setImageBitmap(decodeImage);
+            }
             return view;
         }
     }

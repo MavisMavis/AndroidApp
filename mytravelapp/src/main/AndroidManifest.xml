@@ -48,8 +48,10 @@
         </activity>
         <activity
             android:name=".DetailsActivity"
-            android:parentActivityName=".ContentActivity"
-            android:label="Diary Detail">
+            android:label="Diary Detail"
+            android:parentActivityName=".ContentActivity">
+        </activity>
+        <activity android:name=".EditDiaryDetails">
         </activity>
     </application>
 

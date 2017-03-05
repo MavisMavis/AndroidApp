@@ -50,6 +50,7 @@ public class databaseHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
     }
 
+    // To insert new user
     public boolean insertUserData(String userName, String password, String emailAdd)
     {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
@@ -70,6 +71,7 @@ public class databaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    // To insert new diary record
     public boolean insertDiaryData(String diaryTitle, String diaryLocation, String diaryImg, String diaryInfo, String diaryDate, String diaryUserID)
     {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
@@ -93,6 +95,7 @@ public class databaseHelper extends SQLiteOpenHelper {
         }
     }
 
+    // To retrieve all user records
     public Cursor viewAllUserRecords()
     {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
@@ -101,6 +104,7 @@ public class databaseHelper extends SQLiteOpenHelper {
         return res;
     }
 
+    // To retrieve all Diary Records
     public Cursor viewAllDiaryRecords(String id)
     {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
@@ -109,6 +113,7 @@ public class databaseHelper extends SQLiteOpenHelper {
         return res;
     }
 
+    // To delete specific Diary Record
     public Integer deleteDiaryRecord(String id)
     {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
@@ -116,7 +121,8 @@ public class databaseHelper extends SQLiteOpenHelper {
         return sqLiteDatabase.delete(DIARY_TABLE, "DIARY_ID = ?", new String[] {id});
     }
 
-    public Integer editDiaryRecord(String diaryID, String diaryTitle, String diaryLocation, String diaryImg, String diaryInfo)
+    // To update specific Diary Record
+    public Integer editDiaryRecord(String diaryID, String diaryTitle, String diaryLocation, String diaryImg, String diaryInfo, String diaryDate)
     {
         SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
@@ -124,26 +130,8 @@ public class databaseHelper extends SQLiteOpenHelper {
         cv.put(diary_location,diaryLocation);
         cv.put(diary_image,diaryImg);
         cv.put(diary_info,diaryInfo);
+        cv.put(diary_date, diaryDate);
         return sqLiteDatabase.update(DIARY_TABLE, cv, "DIARY_ID = ?", new String[] {diaryID});
     }
-
-    public Cursor viewSelectedDiaryRecord(String id)
-    {
-        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        Cursor res = sqLiteDatabase.rawQuery("SELECT * FROM " + DIARY_TABLE + " WHERE " + diary_id + " = " + id, null);
-
-        return res;
-    }
-
-    public Cursor viewSelectedDiaryDateRecord(String date)
-    {
-        String args[] = {date};
-        SQLiteDatabase sqLiteDatabase = this.getWritableDatabase();
-        Cursor res = sqLiteDatabase.rawQuery("SELECT * FROM " + DIARY_TABLE + " WHERE " + diary_date + " = ?", args);
-
-        return res;
-    }
-
-
 }
 

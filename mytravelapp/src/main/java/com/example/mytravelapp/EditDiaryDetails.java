@@ -1,14 +1,8 @@
 package com.example.mytravelapp;
 
-
-import android.Manifest;
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -16,17 +10,10 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.Build;
-import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
@@ -43,8 +30,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 
-
-public class NewDiary extends AppCompatActivity {
+public class EditDiaryDetails extends AppCompatActivity {
+    String id, title, location, img, info, date;
     EditText mDateView;
     EditText mTitleView;
     EditText mLocationView;
@@ -66,12 +53,23 @@ public class NewDiary extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_diary);
+        setContentView(R.layout.activity_edit_diary_details);
         // initiate the DB handler
         mydb = new databaseHelper(this);
 
+        //collect our intent and populate our layout
+        Intent intent = getIntent();
+
+        id = intent.getStringExtra("diaryID");
+        title = intent.getStringExtra("diaryTitle");
+        location = intent.getStringExtra("diaryLocation");
+        img = intent.getStringExtra("diaryImg");
+        info = intent.getStringExtra("diaryInfo");
+        date = intent.getStringExtra("diaryDate");
+
         // initiate the date picker and a button
-        mDateView = (EditText) findViewById(R.id.diary_date);
+        mDateView = (EditText) findViewById(R.id.edit_diary_date);
+        mDateView.setText(date);
         // perform click event on edit text
         mDateView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,7 +80,7 @@ public class NewDiary extends AppCompatActivity {
                 int mMonth = c.get(Calendar.MONTH); // current month
                 int mDay = c.get(Calendar.DAY_OF_MONTH); // current day
                 // date picker dialog
-                datePickerDialog = new DatePickerDialog(NewDiary.this,
+                datePickerDialog = new DatePickerDialog(EditDiaryDetails.this,
                         new DatePickerDialog.OnDateSetListener() {
 
                             @Override
@@ -98,23 +96,22 @@ public class NewDiary extends AppCompatActivity {
         });
 
         // initiate the diary title
-        mTitleView = (EditText) findViewById(R.id.diary_title);
+        mTitleView = (EditText) findViewById(R.id.edit_diary_title);
+        mTitleView.setText(title);
         // initiate the diary location
-        mLocationView = (EditText) findViewById(R.id.diary_location);
+        mLocationView = (EditText) findViewById(R.id.edit_diary_location);
+        mLocationView.setText(location);
         // initiate the diary image
-        mImageView = (TextView) findViewById(R.id.imageViewDescription);
-
-        // initiate the image decode holder
-        mImageDecodeView = (TextView) findViewById(R.id.imageDecodeView);
-
+        mImageView = (TextView) findViewById(R.id.editImageViewDescription);
+        mImageDecodeView = (TextView) findViewById(R.id.editImageDecodeView);
         // initiate image button
-        btnImageUpload = (Button) findViewById(R.id.btnImageUpload);
+        btnImageUpload = (Button) findViewById(R.id.btnEditImageUpload);
         btnImageUpload.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Create intent to Open Image applications like Gallery, Google Photos
                 Intent galleryIntent = new Intent(Intent.ACTION_PICK,
-                      android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 // Start the Intent
                 startActivityForResult(galleryIntent, RESULT_LOAD_IMG);
                 //Intent intent = new Intent(ContentActivity.this, NewDiary.class);
@@ -123,34 +120,37 @@ public class NewDiary extends AppCompatActivity {
         });
 
         // initiate the diary entry
-        mDiaryView = (EditText) findViewById(R.id.diary_diary);
+        mDiaryView = (EditText) findViewById(R.id.edit_diary_diary);
+        mDiaryView.setText(info);
         // initiate the button to create new diary entry
-        btnNewDiary = (Button) findViewById(R.id.btnNewDiary);
+        btnNewDiary = (Button) findViewById(R.id.btnEditDiary);
         btnNewDiary.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                insertNewDiary();
+                updateDiary();
             }
         });
     }
 
     // function to insert a new diary entry
-    private void insertNewDiary() {
+    private void updateDiary() {
         // Store values of the new diary entry
         String date = mDateView.getText().toString();
         String title = mTitleView.getText().toString();
         String location = mLocationView.getText().toString();
         String image = mImageDecodeView.getText().toString();
-        String diary = mDiaryView.getText().toString();
-        SharedPreferences setting = getSharedPreferences("usersettings", Context.MODE_PRIVATE);
-        String userID = setting.getString("ID", "");
-        boolean success = mydb.insertDiaryData(title, location, image, diary, date, userID);
+        if(mImageView.getText().toString().contains("Example")){
+            image = img;
+        }
 
-       if(success){
-           Toast.makeText(NewDiary.this, "New Diary Entry Successful", Toast.LENGTH_SHORT).show();
-           Intent intent = new Intent(NewDiary.this, ContentActivity.class);
-           startActivity(intent);
-       }
+        String diary = mDiaryView.getText().toString();
+        int success = mydb.editDiaryRecord(id, title, location, image, diary, date);
+
+        if(success > 0){
+            Toast.makeText(EditDiaryDetails.this, "Edit Diary Entry Successful", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(EditDiaryDetails.this, ContentActivity.class);
+            startActivity(intent);
+        }
     }
 
     //Checking current Activity Result
@@ -182,8 +182,8 @@ public class NewDiary extends AppCompatActivity {
                         imgDecodableString = cursor.getString(columnIndex);
                         cursor.close();
                         //Toast.makeText(this, "Image : "+ encodeImage, Toast.LENGTH_LONG).show();
-                        mImageDecodeView.setText(encodeImage);
                         mImageView.setText(selectedImage.toString());
+                        mImageDecodeView.setText(encodeImage);
 
 
                     } else {
@@ -199,10 +199,6 @@ public class NewDiary extends AppCompatActivity {
                 onCaptureImageResult(data);
         }
     }
-
-
-
-
 
     //Check user selection, and handle permission request
     @Override

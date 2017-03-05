@@ -3,17 +3,22 @@
               android:orientation="vertical"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
+              android:paddingBottom="@dimen/activity_vertical_margin"
+              android:paddingLeft="@dimen/activity_horizontal_margin"
+              android:paddingRight="@dimen/activity_horizontal_margin"
+              android:paddingTop="@dimen/activity_vertical_margin"
               android:weightSum="1">
 
     <ScrollView
         android:id="@+id/scrollView"
-        android:layout_width="380dp"
-        android:layout_height="317dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_weight="0.96">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:orientation="vertical"
+
             android:layout_height="wrap_content">
 
             <ImageView
@@ -22,14 +27,14 @@
                 android:contentDescription="Diary Image"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
-                android:layout_marginBottom="10dp"
-                android:background="#cc0033"/>
+                android:layout_marginBottom="10dp"/>
             <TextView
                 android:id="@+id/details_date"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Date"
-                android:layout_marginBottom="5dp"/>
+                android:textSize="15sp"
+                android:layout_marginBottom="10dp"/>
             <TextView
                 android:id="@+id/details_title"
                 android:layout_width="match_parent"
@@ -44,7 +49,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="15sp"
                 android:text="Location here"
-                android:layout_marginBottom="15dp"/>
+                android:layout_marginBottom="10dp"/>
 
             <TextView
                 android:id="@+id/details_info"
@@ -53,29 +58,33 @@
                 android:layout_marginBottom="10dp"
                 android:text="Description here"/>
 
+            <Button
+                android:text="Edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnEdit"
+                android:background="@android:color/holo_green_dark"
+                android:textAppearance="@style/TextAppearance.AppCompat.Light.SearchResult.Title"
+                android:fontFamily="sans-serif"
+                android:textSize="24sp"
+                android:textStyle="normal|bold"
+                android:textAlignment="center"/>
 
+            <Button
+                android:text="Delete"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/btnDelete"
+                android:textSize="24sp"
+                android:layout_marginTop="10dp"
+                android:background="@android:color/holo_red_dark"
+                android:textAppearance="@style/TextAppearance.AppCompat.Light.SearchResult.Title"
+                android:textStyle="normal|bold"
+                android:fontFamily="sans-serif"/>
 
         </LinearLayout>
 
     </ScrollView>
 
-    <Button
-        android:text="Edit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnEdit"
-        android:fontFamily="sans-serif"
-        android:textStyle="normal|bold"
-        android:textSize="14sp"
-        />
-
-    <Button
-        android:text="Delete"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/btnDelete"
-        android:textStyle="normal|bold"
-        android:textAlignment="center"
-        android:fontFamily="sans-serif"/>
 
 </LinearLayout>
